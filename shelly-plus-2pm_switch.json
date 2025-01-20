@@ -66,13 +66,13 @@
       "ShellySwitch0" : {"type":"http-get", "isHub":false, "command": "http://$ShellyURI:$ShellyPort/rpc/Switch.GetStatus?id=0", "pooltime":"3000", "poolduration":"",
         "evalwrite": [
           {"variable": "Switch0Output", "value": "DYNAMIK JSON.parse(\"$Result\").output" },
-          {"variable": "Switch0Status", "value": "DYNAMIK ($Switch0Output==true?\"ON\":\"OFF\") + \" Watt: \" + JSON.parse(\"$Result\").apower + \" Ampere: \" + JSON.parse(\"$Result\").current + \" Volt: \" + JSON.parse(\"$Result\").voltage" }
+          {"variable": "Switch0Status", "value": "DYNAMIK ($Switch0Output==true?\"ON \":\"OFF \") + JSON.parse(\"$Result\").apower + \"W \" + JSON.parse(\"$Result\").current + \"A \" + JSON.parse(\"$Result\").voltage + \"V\" " }
         ]
       },
       "ShellySwitch1" : {"type":"http-get", "isHub":false, "command": "http://$ShellyURI:$ShellyPort/rpc/Switch.GetStatus?id=1", "pooltime":"3000", "poolduration":"",
         "evalwrite": [
           {"variable": "Switch1Output", "value": "DYNAMIK JSON.parse(\"$Result\").output" },
-          {"variable": "Switch1Status", "value": "DYNAMIK ($Switch1Output==true?\"ON\":\"OFF\") + \" Watt: \" + JSON.parse(\"$Result\").apower + \" Ampere: \" + JSON.parse(\"$Result\").current + \" Volt: \" + JSON.parse(\"$Result\").voltage" }
+          {"variable": "Switch1Status", "value": "DYNAMIK ($Switch1Output==true?\"ON \":\"OFF \") + JSON.parse(\"$Result\").apower + \"W \" + JSON.parse(\"$Result\").current + \"A \" + JSON.parse(\"$Result\").voltage + \"V\" " }
         ]
       }
     },
