@@ -56,7 +56,7 @@ Some features like labels, sliders and switches will only update properly, when 
 Note: The buttons "POWER ON" and "POWER OFF" are automatically added to the automatically generated recipes of each Shelly device.
 
 ### All other Shortcuts, Labels, Sliders and Switches
-Using the actual features of the Shelly devices is done by adding shortcuts, labels sliders or switches to the slide of a recipe. The features of each Shelly type are different. Please refer to the chapter 
+Using the actual features of the Shelly devices is done by adding shortcuts, labels, sliders or switches to the slide of a recipe. The features of each Shelly type are different. Please refer to the next chapter.
 
 ## Supported Shelly Devices and Features
 The follwing Shelly devices of Gen2 upwards are supported and/ or planned to be added. Please contact us on telegram if you have a request for a new Shelly driver.
