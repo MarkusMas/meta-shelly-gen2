@@ -62,7 +62,7 @@ Using the actual features of the Shelly devices is done by adding shortcuts, lab
 The follwing Shelly devices of Gen2 upwards are supported and/ or planned to be added. Please contact us on telegram if you have a request for a new Shelly driver.
 
 ### Shelly Plus 2PM (Mode: Switch)
-The Shelly device ["Shelly Plus 2PM"](https://www.shelly.com/products/shelly-plus-2pm) contains two relays and is capable of power metering (PM) each channal. It can either be set to use both relays independently switch mode. Or it can be set to control covers/ blinds.\
+The Shelly device ["Shelly Plus 2PM"](https://www.shelly.com/products/shelly-plus-2pm) contains two relays and is capable of power metering (PM) each channel. It can either be set to use both relays independently switch mode. Or it can be set to control covers/ blinds.\
 This driver is designed for the mode "switch".
 
 #### Buttons
