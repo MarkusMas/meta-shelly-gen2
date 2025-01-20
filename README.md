@@ -78,7 +78,7 @@ All the above buttons are also available for "SWITCH 1 ..."
 The above label is also available for "SWITCH 1"
 
 #### Switches
-- SWITCH 0: Toggle switch with
+- SWITCH 0: Toggle switch with updating power status
 
 The above switch is also available for "SWITCH 1"
 
