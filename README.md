@@ -73,7 +73,7 @@ This driver is designed for the mode "switch".
 All the above buttons are also available for "SWITCH 1 ..."
 
 #### Lables
-- SWITCH 0: contains the current status of the channel including power status (ON/OFF), power consumption (Wattage), current (Amps) and voltage (Volt) . For example: "SWITCH 0: ON 50W 2A 228.6V". Also, each time a key is pressed, the actual switching state of the relay is displayed for a fraction of a second. For example "SWITCH 0: TURNED ON", "SWITCH 0: STAYS ON", etc.
+- SWITCH 0: contains the current status of the channel including power status (ON/OFF), power consumption (Wattage), current (Amps) and voltage (Volt) . For example: "SWITCH 0: ON 50W 2A 228.6V". Also, each time a button is pressed, the actual switching state of the relay is displayed for a fraction of a second. For example "SWITCH 0: TURNED ON", "SWITCH 0: STAYS ON", etc.
 
 The above label is also available for "SWITCH 1"
 
