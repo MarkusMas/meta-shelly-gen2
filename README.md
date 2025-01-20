@@ -34,8 +34,6 @@ So the decision was made to initially publish the driver without authentication.
 12. When asked for the "<security code>", enter the IP adress of your Shelly Device (For example: "192.168.178.1") and click "verify". [Please Note: Port 80 is used by default. Add the port if different. For example: "192.168.178.1:81"] A communication and compatability check is performed in the background. If successful, your device will be added to the list of compatible devices displayed on the next page.
 13. Select the device you want to add to your NEEO and click "next".
 14. Follow the remaining instructions in the app to install your device to your NEEO system.
-
-In Case the "Checking" hangs up at a certain Number: Repeat the Process starting at Step 7 and refresh the List less often - In the worst Case wait 30sec or more then refresh just once (maybe also the DataStore.json has to be cleared).
  
 ### b) Manual Installation for advanced Users
 1. Download the respective driver file for your device (for example: "shelly-plus-2pm_switch.json") to the Subfolder "active" of your meta Installation.
