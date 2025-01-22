@@ -1,0 +1,96 @@
+{ "name":"Shelly Plus 2PM (Mode: Switch)", 
+  "manufacturer":"Shelly",
+  "version":1,
+  "compatible-meta":"1.0.5",
+  "type":"MUSICPLAYER",
+  "persistedvariables":{
+    "IsRegistered": false,
+    "ToInitiate": true,
+    "MyDevices":"[]"
+  },
+  "variables":{
+    "NewDevice":"[]",
+    "NewUri": "",
+    "NewPort":"",
+    "CompatibleModel":"[\"SNSW-002P16EU\", \"SNSW-102P16EU\"]",
+    "CompatibleProfile":"switch"
+  },
+  "register":{
+    "registerheadertext": "Shelly",
+    "registerdescription": "Please enter the IP Adress of your Shelly device. \n For example: 192.168.178.1 \n Port 80 is used by default. Add the port if different.",
+    "command": {"type": "static", "command": ".", "queryresult": "$.*"}
+  },
+  "discover": {
+    "welcomeheadertext": "Shelly Plus 2PM in Switch Mode",
+    "welcomedescription":"powered by meta v2 \n by JAC459 \n X \n Driver Development \n by MarkusM",
+    "initcommandset":[{
+      "label":"",
+      "type":"static",
+      "command":"$RegistrationCode",
+      "queryresult":"",
+      "evalwrite":[
+        {"variable":"NewDevice", "value":"DYNAMIK let device = {\"ip\":\"\", \"port\":\"\", \"model\":\"\", \"name\":\"\", \"mac_address\":\"\", \"profile\":\"\", \"auth_en\":\"\" }; device.ip = \"$Result\"; device.port = (\"$Result\".split(\":\")[1]!=undefined?\"$Result\".split(\":\")[1]:\"80\"); JSON.stringify(device); "},
+        {"variable":"NewUri",    "value":"DYNAMIK \"$Result\" "},
+        {"variable":"NewPort",   "value":"DYNAMIK \"$Result\".split(\":\")[1]!=undefined?\"$Result\".split(\":\")[1]:\"80\"; "}
+      ]
+      },{
+      "type":"http-get",
+      "command": "http://$NewUri:$NewPort/rpc/Shelly.GetDeviceInfo",
+      "queryresult" : "$.",
+      "evalwrite":[
+        {"variable":"NewDevice", "value":"DYNAMIK let device = $NewDevice; device.name = (JSON.parse(\"$Result\").name == null ? \"Shelly Plus 2PM \"+device.ip : JSON.parse(\"$Result\").name); device.model = JSON.parse(\"$Result\").model; device.mac_address=JSON.parse(\"$Result\").mac; device.profile=JSON.parse(\"$Result\").profile; device.auth_en=JSON.parse(\"$Result\").auth_en; JSON.stringify(device); "},
+        {"variable":"MyDevices", "value":"DYNAMIK let device = $NewDevice; let mydevices = $MyDevices; device?.name != undefined && $CompatibleModel.includes(device?.model) && \"$CompatibleProfile\" == device?.profile && device?.auth_en == false ? ( (mydevices=mydevices || []).some(i=>i.ip==device.ip) ? mydevices[mydevices.findIndex(i=>i.ip==device.ip)]=device : mydevices.push(device) ) : mydevices ; JSON.stringify(mydevices); "}
+      ],
+      "evaldo":[{"test":"DYNAMIK let device = $NewDevice; $CompatibleModel.includes(device?.model) && \"$CompatibleProfile\" == device?.profile && device?.auth_en == false; ","then":"__PERSIST", "or":""}]
+      }],
+      "command": {"type": "static", "command": "$MyDevices", "queryresult": "$.*"}
+  },
+  "template":{
+    "dynamicname":"DYNAMIK_INST_START DYNAMIK JSON.parse(\"$Result\").name DYNAMIK_INST_END",
+    "dynamicid":  "DYNAMIK_INST_START DYNAMIK JSON.parse(\"$Result\").ip   DYNAMIK_INST_END",
+    "variables":{
+      "ShellyURI": "DYNAMIK_INST_START DYNAMIK JSON.parse(\"$Result\").ip   DYNAMIK_INST_END",
+      "ShellyPort":"DYNAMIK_INST_START DYNAMIK JSON.parse(\"$Result\").port DYNAMIK_INST_END",
+      "Switch0Output":false,
+      "Switch1Output":false,
+      "Switch0Status":"",
+      "Switch1Status":"",
+      "Switch0ActionStatus":"",
+      "Switch1ActionStatus":""
+    },
+    "labels":{
+      "StatusSwitch0": {"label":"SWITCH 0", "listen":"Switch0Status", "actionlisten":"Switch0ActionStatus"},
+      "StatusSwitch1": {"label":"SWITCH 1", "listen":"Switch1Status", "actionlisten":"Switch1ActionStatus"}
+    },
+    "listeners":{
+      "ShellySwitch0" : {"type":"http-get", "isHub":false, "command": "http://$ShellyURI:$ShellyPort/rpc/Switch.GetStatus?id=0", "pooltime":"3000", "poolduration":"",
+        "evalwrite": [
+          {"variable": "Switch0Output", "value": "DYNAMIK JSON.parse(\"$Result\").output" },
+          {"variable": "Switch0Status", "value": "DYNAMIK ($Switch0Output==true?\"ON \":\"OFF \") + JSON.parse(\"$Result\").apower + \"W \" + JSON.parse(\"$Result\").current + \"A \" + JSON.parse(\"$Result\").voltage + \"V\" " }
+        ]
+      },
+      "ShellySwitch1" : {"type":"http-get", "isHub":false, "command": "http://$ShellyURI:$ShellyPort/rpc/Switch.GetStatus?id=1", "pooltime":"3000", "poolduration":"",
+        "evalwrite": [
+          {"variable": "Switch1Output", "value": "DYNAMIK JSON.parse(\"$Result\").output" },
+          {"variable": "Switch1Status", "value": "DYNAMIK ($Switch1Output==true?\"ON \":\"OFF \") + JSON.parse(\"$Result\").apower + \"W \" + JSON.parse(\"$Result\").current + \"A \" + JSON.parse(\"$Result\").voltage + \"V\" " }
+        ]
+      }
+    },
+    "switches":{
+      "Switch0" : {"label":"SWITCH 0", "listen":"Switch0Output", "evaldo":[{"test":"DYNAMIK $Switch0Output", "then":"SWITCH 0 ON", "or":"SWITCH 0 OFF"}]},
+      "Switch1" : {"label":"SWITCH 1", "listen":"Switch1Output", "evaldo":[{"test":"DYNAMIK $Switch1Output", "then":"SWITCH 1 ON", "or":"SWITCH 1 OFF"}]}
+    },
+    "buttons":{
+      "POWER ON":    {"label":"", "type":"static",   "command":"", "evaldo":[{"test":true,"then":"__INITIALISE", "or":""}]},
+      "POWER OFF":   {"label":"", "type":"static",   "command":"", "evaldo":[{"test":true,"then":"__CLEANUP",    "or":""}]},
+
+      "SWITCH 0 ON":     {"label":"", "type":"http-get", "command":"http://$ShellyURI:$ShellyPort/rpc/Switch.Set?id=0&on=true", "evalwrite":[{"variable":"Switch0ActionStatus", "value":"DYNAMIK JSON.parse(\"$Result\").was_on==true ? \"stays on\"   : (JSON.parse(\"$Result\").was_on==false ? \"turned on\" : \"Command failed\") "}] },
+      "SWITCH 0 OFF":    {"label":"", "type":"http-get", "command":"http://$ShellyURI:$ShellyPort/rpc/Switch.Set?id=0&on=false","evalwrite":[{"variable":"Switch0ActionStatus", "value":"DYNAMIK JSON.parse(\"$Result\").was_on==true ? \"turned off\" : (JSON.parse(\"$Result\").was_on==false ? \"stays off\" : \"Command failed\") "}] },
+      "SWITCH 0 TOGGLE": {"label":"", "type":"http-get", "command":"http://$ShellyURI:$ShellyPort/rpc/Switch.Toggle?id=0",      "evalwrite":[{"variable":"Switch0ActionStatus", "value":"DYNAMIK JSON.parse(\"$Result\").was_on==true ? \"turned off\" : (JSON.parse(\"$Result\").was_on==false ? \"turned on\" : \"Command failed\") "}] },
+
+      "SWITCH 1 ON":     {"label":"", "type":"http-get", "command":"http://$ShellyURI:$ShellyPort/rpc/Switch.Set?id=1&on=true", "evalwrite":[{"variable":"Switch1ActionStatus", "value":"DYNAMIK JSON.parse(\"$Result\").was_on==true ? \"stays on\"   : (JSON.parse(\"$Result\").was_on==false ? \"turned on\" : \"Command failed\") "}] },
+      "SWITCH 1 OFF":    {"label":"", "type":"http-get", "command":"http://$ShellyURI:$ShellyPort/rpc/Switch.Set?id=1&on=false","evalwrite":[{"variable":"Switch1ActionStatus", "value":"DYNAMIK JSON.parse(\"$Result\").was_on==true ? \"turned off\" : (JSON.parse(\"$Result\").was_on==false ? \"stays off\" : \"Command failed\") "}] },
+      "SWITCH 1 TOGGLE": {"label":"", "type":"http-get", "command":"http://$ShellyURI:$ShellyPort/rpc/Switch.Toggle?id=1",      "evalwrite":[{"variable":"Switch1ActionStatus", "value":"DYNAMIK JSON.parse(\"$Result\").was_on==true ? \"turned off\" : (JSON.parse(\"$Result\").was_on==false ? \"turned on\" : \"Command failed\") "}] }
+    }
+  }
+}
