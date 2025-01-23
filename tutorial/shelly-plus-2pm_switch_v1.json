@@ -24,8 +24,8 @@
       "command":"$RegistrationCode",
       "queryresult":"",
       "evalwrite":[
-        {"variable":"NewDevice", "value":"DYNAMIK let device = {\"ip\":\"\", \"port\":\"\", \"model\":\"\", \"name\":\"\", \"mac_address\":\"\", \"profile\":\"\", \"auth_en\":\"\" }; device.ip = \"$Result\"; device.port = (\"$Result\".split(\":\")[1]!=undefined?\"$Result\".split(\":\")[1]:\"80\"); JSON.stringify(device); "},
-        {"variable":"NewUri",    "value":"DYNAMIK \"$Result\" "},
+        {"variable":"NewDevice", "value":"DYNAMIK let device = {\"ip\":\"\", \"port\":\"\", \"model\":\"\", \"name\":\"\", \"mac_address\":\"\", \"profile\":\"\", \"auth_en\":\"\" }; device.ip = \"$Result\".split(\":\")[0]; device.port = (\"$Result\".split(\":\")[1]!=undefined?\"$Result\".split(\":\")[1]:\"80\"); JSON.stringify(device); "},
+        {"variable":"NewUri",    "value":"DYNAMIK \"$Result\".split(\":\")[0] "},
         {"variable":"NewPort",   "value":"DYNAMIK \"$Result\".split(\":\")[1]!=undefined?\"$Result\".split(\":\")[1]:\"80\"; "}
       ]
       },{
