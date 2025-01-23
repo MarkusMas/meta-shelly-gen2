@@ -19,14 +19,14 @@ The driver uses the following structure and elements:
  5  "type":"MUSICPLAYER",
  6  "persistedvariables":{...},
 11  "variables": {...},
-18  "register":  {...},
-23  "discover":  {...},
+18  "discover":  {...},
+23  "register":  {...},
 48  "template":  {...}
 96  }
 ```
 #### Use multiple Devices with one Driver
 To enable the driver to address multiple Shelly devices, the driver must contain a section in which a list of the devices to be addressed is created.\
-In this example, the list of "mydevices" is created over the course of the objects “persistedvariables”, “variables”, “register” and “discover”.
+In this example, the list of "mydevices" is created over the course of the objects “persistedvariables”, “variables”, “discover” and “register”.
 The actual driver for controlling the Shelly devices from this list is then located in the separate “template” section.
 
 Note: In the case of simpler drivers for controlling only one device, the above-mentioned splitting can be dropped. In this case, the object template is not required and its content can be stored directly in the root level of the json.
@@ -80,7 +80,56 @@ Variables are parameters that are used during the running time of meta. If meta 
 - CompatibleModel: Here i list all the Shelly model types that are compatible with this driver
 - CompatibleProfile: This is the mode, the Shelly need to be set to, in order to be compatible with this driver
 
+#### discover (Lines 18-42)
+```javascript
+18  "discover": {
+19    "welcomeheadertext": "Shelly Plus 2PM in Switch Mode",
+20    "welcomedescription":"powered by meta v2 \n by JAC459 \n X \n Driver Development \n by MarkusM",
+21    "initcommandset":[{
+22      "label":"",
+23      "type":"static",
+24      "command":"$RegistrationCode",
+25      "queryresult":"",
+26      "evalwrite":[
+27        {"variable":"NewDevice", "value":"DYNAMIK let device = {\"ip\":\"\", \"port\":\"\", \"model\":\"\", \"name\":\"\", \"mac_address\":\"\", \"profile\":\"\", \"auth_en\":\"\" }; device.ip = \"$Result\"; device.port = (\"$Result\".split(\":\")[1]!=undefined?\"$Result\".split(\":\")[1]:\"80\"); JSON.stringify(device); "},
+28        {"variable":"NewUri",    "value":"DYNAMIK \"$Result\" "},
+29        {"variable":"NewPort",   "value":"DYNAMIK \"$Result\".split(\":\")[1]!=undefined?\"$Result\".split(\":\")[1]:\"80\"; "}
+30      ]
+31      },{
+32      "type":"http-get",
+33      "command": "http://$NewUri:$NewPort/rpc/Shelly.GetDeviceInfo",
+34      "queryresult" : "$.",
+35      "evalwrite":[
+36        {"variable":"NewDevice", "value":"DYNAMIK let device = $NewDevice; device.name = (JSON.parse(\"$Result\").name == null ? \"Shelly Plus 2PM \"+device.ip : JSON.parse(\"$Result\").name); device.model = JSON.parse(\"$Result\").model; device.mac_address=JSON.parse(\"$Result\").mac; device.profile=JSON.parse(\"$Result\").profile; device.auth_en=JSON.parse(\"$Result\").auth_en; JSON.stringify(device); "},
+37        {"variable":"MyDevices", "value":"DYNAMIK let device = $NewDevice; let mydevices = $MyDevices; device?.name != undefined && $CompatibleModel.includes(device?.model) && \"$CompatibleProfile\" == device?.profile && device?.auth_en == false ? ( (mydevices=mydevices || []).some(i=>i.ip==device.ip) ? mydevices[mydevices.findIndex(i=>i.ip==device.ip)]=device : mydevices.push(device) ) : mydevices ; JSON.stringify(mydevices); "}
+38      ],
+39      "evaldo":[{"test":"DYNAMIK let device = $NewDevice; $CompatibleModel.includes(device?.model) && \"$CompatibleProfile\" == device?.profile && device?.auth_en == false; ","then":"__PERSIST", "or":""}]
+40      }],
+41      "command": {"type": "static", "command": "$MyDevices", "queryresult": "$.*"}
+42  },
+```
+
+In "discover" the content of the first page of the regestration process in the NEEO app is set up. In in addition, a set of three commands ("initcommandset") is chained that are to be executed prior to proceeding with registration.
+
+##### Processing $RegistrationCode
+The first command is set to take the content of the variable "$RegistrationCode" and process it for later use. The content of this variable are whatever is entered  in the NEEO app or the web UI during the second page of the registration process as "security code". Also refer to chapter below ["register (Lines 44-47)"](#register (Lines 44-47)) 
 
 
+
+#### register (Lines 44-47)
+```javascript
+44  "register":{
+45    "registerheadertext": "Shelly",
+46    "registerdescription": "Please enter the IP Adress of your Shelly device. \n For example: 192.168.178.1 \n Port 80 is used by default. Add the port if different.",
+47    "command": {"type": "static", "command": ".", "queryresult": "$.*"}
+48  },
+```
+
+In "register" the content of the second page of the regestration process in the NEEO app is set up.
+- registerheadertext: Deadline displayed.
+- registerdescription: Description displayd. You can use "\n" to put the following text in a new line.
+- command: In case of the Shelly driver this command is "unused" as previously set device list "MyDevices" will be forwarded to "template".
+
+At the bottom of this second page of the registration process, the “security code” has to be entered. The content of this field will be handed to the variable "$RegistrationCode".
 
 ...
