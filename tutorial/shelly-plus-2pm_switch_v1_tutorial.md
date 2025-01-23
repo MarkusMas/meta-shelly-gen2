@@ -126,7 +126,7 @@ Variables are parameters that are used during the running time of meta. If meta 
 ```
 </details>
 
-In "discover" the content of the first page of the regestration process in the NEEO app is set up. In in addition, a set of three commands ("initcommandset") is chained that are to be executed prior to proceeding with registration.
+In "discover" the content of the first page of the regestration process in the NEEO app is set up. In addition, a set of three commands ("initcommandset") is chained that are to be executed prior to proceeding with registration.
 
 #### First initialisation Command: Processing $RegistrationCode
 The first command is set to take the content of the variable "$RegistrationCode" and process it for later use. The content of this variable are whatever is entered  in the NEEO app or the web UI during the second page of the registration process as "security code". Also refer to chapter below [register (Lines 43-47)](#register-lines-43-47)
@@ -135,9 +135,9 @@ The first command is set to take the content of the variable "$RegistrationCode"
 - type: The selected command type is "static" as we only want to do some "calculations" without sending any commands to external devices.
 - command: Here we get the content of the variable "RegistrationCode" involved. The dollar symbol is the indicator for meta that a variable name is following in the code. "RegistrationCode" is a variable that is set globaly by meta. It does not need to be set in the [beginning of the driver)](#variables-lines-11-17).
 - queryresult: No query needed in this case as we want "RegistrationCode" beeing handed over to evalwrite as is. For the following steps of this command the result of this query will be available as the variable "$RESULT".
-- evalwrite: Here we are setting variables of meta to new values. Each variable is called by their name and the values are set. Using the prefix "DYNAMIK" in the value triggers meta to interpret all the following code of the json key "value" as javascript code.
-   - variable "NewDevice": An empty temporary variable "device" is created and the "$RESULT" (security code) is split into pieces (ip and port) and saved into that. The variable "device" is than stringifyed to json and the result of that will be "NewDevice".
-   - variable "NewUri": The "$RESULT" is proceccced to obtain the IP address of the device. This is done by splitting a potentially existing port from the "$RESULT" that was entered as the "security code". This is done by splitting the "security code" at the ":" and keeping the front half.
+- evalwrite: Here we are setting variables of meta to new values. Each variable is called by their name and the values are set. Using the prefix "DYNAMIK" in the value triggers meta to interpret all the following code of the json key "value" as javascript code. Javascript code can easily be tested in online compliers. I like to use [this one](https://onecompiler.com/javascript). You will find a link to selected javascript representations used in "DYNAMIK" of this driver. Your can than run the code in the browser and experiment for yourself. Please note that in DYNAMIK some speacial characters need to be "escaped" using a backslash.
+   - variable "NewDevice": An empty temporary variable "device" is created and the "$RESULT" (security code) is split into pieces (ip and port) and saved into that. The variable "device" is than stringifyed to json and the result of that will be "NewDevice". [JS representation](https://onecompiler.com/javascript/436xr9yck)
+   - variable "NewUri": The "$RESULT" is proceccced to obtain the IP address of the device. This is done by splitting a potentially existing port from the "$RESULT" that was entered as the "security code". This is done by splitting the "security code" at the ":" and keeping the front half. [JS representation](https://onecompiler.com/javascript/436xqxu5t)
    - variable "NewPort: The "$RESULT" is proceccced to obtain the port address of the device. This is done by splitting the "security code" at the ":" and keeping the back half. Also when no port was inculded, the port will be set to 80.
 
 #### Second initialisation Command: Checking the entered IP address
@@ -165,7 +165,7 @@ With the next command we want to call the Shelly device to check whether the ent
 
 - queryresult: This will extract information from the json to be used downstream. There are loads of online query testers out there. I like to use [this one](https://www.jsonquerytool.com/). Using the query "$." basically means "forward unchanged" (but brackets are added), as you can see below.
   ![grafik](https://github.com/user-attachments/assets/8c3f4bbe-0c1c-4611-8e3b-566229db90a1)  
-- evalwrite: Here we are setting variables of meta to new values. Each variable is called by their name and the values are set. Using the prefix "DYNAMIK" in the value triggers meta to interpret all the following code of the json key "value" as javascript code.
+- evalwrite: Here we are resetting variables of meta to new values depending on the response. Each variable is called by their name and the values are set. Using the prefix "DYNAMIK" in the value triggers meta to interpret all the following code of the json key "value" as javascript code.
    - variable "NewDevice": The temporary variable "device" is created and is set to the content of the already existing "NewDevice". Then more information is added to the variable based on the new info from the response. First we check whether the name in the response is "null" (this is the case when not set in the Shelly App). If true, we create a name based on "Shelly Plus 2 PM" followed by the ip adsress. If false, we take the name from the response. Then more information like "model", "mac", "profile" and "auth_en" is read from the response and written into the variable The variable "device" is than stringifyed to json and the result of that will be "NewDevice".
    - variable "MyDevices": Now we want to check if the $NewDevice matches a number of parameters to ensure compatibility with this driver. If so, the new device is added to "MyDevices". For that we are creating temporary variables for $NewDevice and $MyDevices to handle them more comfortably in the javascript code. Then a check is performed where the current model and profile is compared to the $CompatibleModel and $CompatibleProfile defined in the beginning of the driver. Also it is checked if authorization if deactivated on the device. If all of those conditions are true, the $NewDevice is added to $MyDevices looking at $MyDevices and checking if this device already exists. If so the entry is replaced. If the device is new to $MyDevices it will be added (inserted in the end).
    - evaldo: With evaldo we can trigger button action based on a test. Here we are testing basically the same as above, to then trigger the hidden button __PERSIST and write the updated "$MyDevices" to permanent memory (\<DriverName\>-DataStore.json). BTW: __PERSIST is a hidden button already programmed into meta. Other userdefined hidden buttons can be created too by using two underscores infront of a button name.
@@ -199,7 +199,9 @@ With the third command of the initialisation commands we want to pass the compat
 - queryresult: This will extract information from the json to be used downstream. Using the query "$.*" basically means "forward unchanged", as you can see below.
   ![grafik](https://github.com/user-attachments/assets/d9a37be4-bc83-46a9-a4c5-88e4766c124e)
 
-The variable $MyDevices will hearby be handed as the $RESULT to next stage, the actual code of the driver. See 
+The variable $MyDevices will hearby be handed as the $RESULT to next stage, the actual code of the driver. See [template)](#template-lines-48-95).
+
+Note: The approach of checking a new device for compatability and then adding it to $MyDevices can be found in many of my drivers (in slightly modified variants).
 
 ### register (Lines 43-47)
 <details>
@@ -374,8 +376,73 @@ To keep track of the status of the Shelly device http requests are sent to it in
 - pooltime: This is the time in millisecond after which the command is repeated to ask for the state again.
 - poolduration: empty (i never had to use this one before)
 - (queryresult: Could potentially be used here. As it is not further specified meta uses the default "$.*" to forward the respone unchanged)
-- evalwrite: Here we are setting variables of meta to new values. Each variable is called by their name and the values are set. Using the prefix "DYNAMIK" in the value triggers meta to interpret all the following code of the json key "value" as javascript code.
+- evalwrite: Here we are resetting variables of meta to new values depending on the response. Each variable is called by their name and the values are set. Using the prefix "DYNAMIK" in the value triggers meta to interpret all the following code of the json key "value" as javascript code.
    - variable "Switch0Output": Forwards the value "output" from the above response. The value is either "true" or "false" depending on the power state.
    - variable "Switch0Status": Here the content of the label is built. Depending on the variable $Switch0Output the label either starts with "ON" or "OFF". After that the measured wattage, current and voltage of the Shelly device are listed.
 
-... to be continued ...
+#### switches (Lines 79-82)
+<details>
+  <summary>click to see code:</summary>
+ 
+```javascript
+79    "switches":{
+80      "Switch0" : {"label":"SWITCH 0", "listen":"Switch0Output", "evaldo":[{"test":"DYNAMIK $Switch0Output", "then":"SWITCH 0 ON", "or":"SWITCH 0 OFF"}]},
+81      "Switch1" : {"label":"SWITCH 1", "listen":"Switch1Output", "evaldo":[{"test":"DYNAMIK $Switch1Output", "then":"SWITCH 1 ON", "or":"SWITCH 1 OFF"}]}
+82    },
+```
+</details>
+
+This code defines two switches in the NEEO UI for this driver.
+- label: Name of the switch in the NEEO UI.
+- listen: Name of the variable the switch is "listening" regarding thestate to display (true/ false).
+- evaldo: With evaldo we can trigger button action based on a test. Here we are testing the state of the variable "$Switch0Output" (true/ false) to then eihter trigger the button "SWICHT ON 0" or the button "SWICHT OFF 0".
+
+*Known Issue/ limitation: Due to a known bug in the original firmware of the remote control, updating the status of the switches on the remote control does not work properly. This is caused by the driver having two switch instances. However the status is updated correctly in the app and the web UI. As a workaround the regular buttons can be used in combination with the lable to retrieve ths status.*
+
+#### buttons (Lines 83-94)
+<details>
+  <summary>click to see code:</summary>
+ 
+```javascript
+83    "buttons":{
+84      "POWER ON":    {"label":"", "type":"static",   "command":"", "evaldo":[{"test":true,"then":"__INITIALISE", "or":""}]},
+85      "POWER OFF":   {"label":"", "type":"static",   "command":"", "evaldo":[{"test":true,"then":"__CLEANUP",    "or":""}]},
+86
+87      "SWITCH 0 ON":     {"label":"", "type":"http-get", "command":"http://$ShellyURI:$ShellyPort/rpc/Switch.Set?id=0&on=true", "evalwrite":[{"variable":"Switch0ActionStatus", "value":"DYNAMIK JSON.parse(\"$Result\").was_on==true ? \"stays on\"   : (JSON.parse(\"$Result\").was_on==false ? \"turned on\" : \"Command failed\") "}] },
+88      "SWITCH 0 OFF":    {"label":"", "type":"http-get", "command":"http://$ShellyURI:$ShellyPort/rpc/Switch.Set?id=0&on=false","evalwrite":[{"variable":"Switch0ActionStatus", "value":"DYNAMIK JSON.parse(\"$Result\").was_on==true ? \"turned off\" : (JSON.parse(\"$Result\").was_on==false ? \"stays off\" : \"Command failed\") "}] },
+89      "SWITCH 0 TOGGLE": {"label":"", "type":"http-get", "command":"http://$ShellyURI:$ShellyPort/rpc/Switch.Toggle?id=0",      "evalwrite":[{"variable":"Switch0ActionStatus", "value":"DYNAMIK JSON.parse(\"$Result\").was_on==true ? \"turned off\" : (JSON.parse(\"$Result\").was_on==false ? \"turned on\" : \"Command failed\") "}] },
+90
+91      "SWITCH 1 ON":     {"label":"", "type":"http-get", "command":"http://$ShellyURI:$ShellyPort/rpc/Switch.Set?id=1&on=true", "evalwrite":[{"variable":"Switch1ActionStatus", "value":"DYNAMIK JSON.parse(\"$Result\").was_on==true ? \"stays on\"   : (JSON.parse(\"$Result\").was_on==false ? \"turned on\" : \"Command failed\") "}] },
+92      "SWITCH 1 OFF":    {"label":"", "type":"http-get", "command":"http://$ShellyURI:$ShellyPort/rpc/Switch.Set?id=1&on=false","evalwrite":[{"variable":"Switch1ActionStatus", "value":"DYNAMIK JSON.parse(\"$Result\").was_on==true ? \"turned off\" : (JSON.parse(\"$Result\").was_on==false ? \"stays off\" : \"Command failed\") "}] },
+93      "SWITCH 1 TOGGLE": {"label":"", "type":"http-get", "command":"http://$ShellyURI:$ShellyPort/rpc/Switch.Toggle?id=1",      "evalwrite":[{"variable":"Switch1ActionStatus", "value":"DYNAMIK JSON.parse(\"$Result\").was_on==true ? \"turned off\" : (JSON.parse(\"$Result\").was_on==false ? \"turned on\" : \"Command failed\") "}] }
+94    }
+```
+</details>
+
+This code defines a number of buttons in the NEEO UI for this driver.
+
+##### POWER ON/ POWER OFF
+With this particular diver the buttons "POWER ON" and "POWER OFF" are not actually meant to turn on or off the Shelly device or the built-in relays. The "POWER ON" button is just meant to initialise the above listeners for monitoring the particular Shelly device by triggering the internal hidden button "__INITIALISE". The button "POWER OFF" is stoping the listeners by triggering "__CLEANUP".
+- label: empty, so the name will be used.
+- type: The selected command type is "static" as we dont need to send any commands to external devices.
+- command: empty
+- evaldo: With evaldo we trigger the internal hidden buttons "__INITIALISE" and "__CLEANUP"
+
+##### SWITCH 0 ON/OFF/TOGGLE
+The buttons "SWITCH 0 ON", "SWITCH 0 OFF" and "SWITCH 0 TOGGLE" are meant to actually control the Shelly device. A set of those buttons is also available for switch 1.The response of all those underlying http request is basically the same. Therefore, the further explanation is made for only the button "SWITCH 0 ON".
+- label: empty, so the name will be used.
+- type: The selected command type is "http-get" as we want to call an http adress and get a response.
+- command: This is the http address we want to call for the request. In this case we are calling for example: ```http://192.168.178.81:80/rpc/Switch.Set?id=0&on=true```. Calling the command will yield for example the following response.
+  <details>
+    <summary>click to see response:</summary>
+
+  ```json
+  {"was_on":false}
+  ```
+  </details>
+
+- evalwrite: Here we are resetting variables of meta to new values depending on the response. Each variable is called by their name and the values are set. Using the prefix "DYNAMIK" in the value triggers meta to interpret all the following code of the json key "value" as javascript code.
+   - variable "Switch0ActionStatus": The content of this variable is meant to be display the switching state (after the button is pressed) for a fraction of a second in the corresponding label. The response will either contain "was_on:true" or "was_on:false". Depending on this value and the button it is used in a combination of contitions is checked to display the corret state.
+
+### closing words
+I hope you have learned something about the architecture of a driver for meta and got some inspiration for writing your own.
