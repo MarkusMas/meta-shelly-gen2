@@ -327,4 +327,32 @@ To display the state of the two built in relays of the Shelly device two labels 
 - listen: Name of the variable with content for the label.
 - actionlisten:  Name of the variable with content that is displayed just for a split second. Than the label reverts back to the variable that is entered in "listen".
 
+#### listeners (Lines 65-78)
+<details>
+  <summary>click to see code:</summary>
+ 
+```javascript
+65    "listeners":{
+66      "ShellySwitch0" : {"type":"http-get", "isHub":false, "command": "http://$ShellyURI:$ShellyPort/rpc/Switch.GetStatus?id=0", "pooltime":"3000", "poolduration":"",
+67        "evalwrite": [
+68          {"variable": "Switch0Output", "value": "DYNAMIK JSON.parse(\"$Result\").output" },
+69          {"variable": "Switch0Status", "value": "DYNAMIK ($Switch0Output==true?\"ON \":\"OFF \") + JSON.parse(\"$Result\").apower + \"W \" + JSON.parse(\"$Result\").current + \"A \" + JSON.parse(\"$Result\").voltage + \"V\" " }
+70        ]
+71      },
+72      "ShellySwitch1" : {"type":"http-get", "isHub":false, "command": "http://$ShellyURI:$ShellyPort/rpc/Switch.GetStatus?id=1", "pooltime":"3000", "poolduration":"",
+73        "evalwrite": [
+74          {"variable": "Switch1Output", "value": "DYNAMIK JSON.parse(\"$Result\").output" },
+75          {"variable": "Switch1Status", "value": "DYNAMIK ($Switch1Output==true?\"ON \":\"OFF \") + JSON.parse(\"$Result\").apower + \"W \" + JSON.parse(\"$Result\").current + \"A \" + JSON.parse(\"$Result\").voltage + \"V\" " }
+76        ]
+77      }
+78    },
+```
+</details>
+
+To keep track of the status of the Shelly device http requests are sent to it in regular intervals, asking for information. Actually two http requests are sent as the state of each of the two switches must be requested under a different adsress.
+
+
+
+
+
 ...
