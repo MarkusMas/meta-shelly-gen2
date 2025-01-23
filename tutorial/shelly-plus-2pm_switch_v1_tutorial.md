@@ -283,6 +283,8 @@ In the beginning we need to set the name and id of the driver respectivly the de
 - dynamicname: This is the name that will be displayed in the registration process (list of compatible devices). For that the $RESULT (previously $MyDevices) is evaluated. Using "DYNAMIK_INST_START" as a prefix in a value is telling meta to look at the $Result of the registration process for that.
 - dynamicid: This is the id of the device, which helps meta to distinguish between different devices. We are using the IP adress here.
 
+For everything else, we examine the code in smaller chunks, separated according to their function.
+
 #### variables (Lines 51-60)
 <details>
   <summary>click to see code:</summary>
