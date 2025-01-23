@@ -444,7 +444,10 @@ The buttons "SWITCH 0 ON", "SWITCH 0 OFF" and "SWITCH 0 TOGGLE" are meant to act
 - evalwrite: Here we are resetting variables of meta to new values depending on the response. Each variable is called by their name and the values are set. Using the prefix "DYNAMIK" in the value triggers meta to interpret all the following code of the json key "value" as javascript code.
    - variable "Switch0ActionStatus": The content of this variable is meant to be display the switching state (after the button is pressed) for a fraction of a second in the corresponding label. The response will either contain "was_on:true" or "was_on:false". Depending on this value and the button it is used in a combination of contitions is checked to display the corret state.
 
-### Closing Words
-I hope you have learned something about the architecture of a driver for meta and got some inspiration for writing your own.\
+<br/>
+<br/>
 
-And if you would like to support what I have created here in my spare time, you are welcome to buy me a [coffee](https://www.paypal.com/me/MarkusMas721).
+### Closing Words
+I hope you have learned something about the architecture of a driver for meta and got some inspiration for writing your own.
+
+And if you would like to support what I have created here in my spare time, you are welcome to buy me a [coffee](https://www.paypal.me/MarkusMas721).
