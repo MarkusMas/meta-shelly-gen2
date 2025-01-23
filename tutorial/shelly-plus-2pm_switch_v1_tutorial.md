@@ -351,8 +351,31 @@ To display the state of the two built in relays of the Shelly device two labels 
 
 To keep track of the status of the Shelly device http requests are sent to it in regular intervals, asking for information. Actually two http requests are sent as the state of each of the two switches must be requested under a different adsress.
 
+- type: The selected command type is "http-get" as we want to call an http adress and get a response.
+- command: This is the http address we want to call for the request. In this case we are calling for example: ```http://192.168.178.81:80/rpc/Shelly.GetDeviceInfo``` You can test this kind of http request with a web browser. Calling the command will yield for example the following response.
+  <details>
+    <summary>click to see response:</summary>
 
+  ```json
+  {"id":0,
+   "source":"HTTP_in",
+   "output":false,
+   "apower":0.0,
+   "voltage":232.9,
+   "freq":50.0,
+   "current":0.000,
+   "pf":0.00,
+   "aenergy":{"total":0.000,"by_minute":[0.000,0.000,0.000],"minute_ts":1737663180},
+   "ret_aenergy":{"total":0.000,"by_minute":[0.000,0.000,0.000],"minute_ts":1737663180},
+   "temperature":{"tC":48.2,"tF":118.8}}
+  ```
+  </details>
 
+- pooltime: This is the time in millisecond after which the command is repeated to ask for the state again.
+- poolduration: empty (i never had to use this one before)
+- (queryresult: Could potentially be used here. As it is not further specified meta uses the default "$.*" to forward the respone unchanged)
+- evalwrite: Here we are setting variables of meta to new values. Each variable is called by their name and the values are set. Using the prefix "DYNAMIK" in the value triggers meta to interpret all the following code of the json key "value" as javascript code.
+   - variable "Switch0Output": Forwards the value "output" from the above response. The value is either "true" or "false" depending on the power state.
+   - variable "Switch0Status": Here the content of the label is built. Depending on the variable $Switch0Output the label either starts with "ON" or "OFF". After that the measured wattage, current and voltage of the Shelly device are listed.
 
-
-...
+... to be continued ...
