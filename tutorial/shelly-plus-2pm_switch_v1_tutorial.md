@@ -112,11 +112,29 @@ Variables are parameters that are used during the running time of meta. If meta 
 In "discover" the content of the first page of the regestration process in the NEEO app is set up. In in addition, a set of three commands ("initcommandset") is chained that are to be executed prior to proceeding with registration.
 
 ##### Processing $RegistrationCode
-The first command is set to take the content of the variable "$RegistrationCode" and process it for later use. The content of this variable are whatever is entered  in the NEEO app or the web UI during the second page of the registration process as "security code". Also refer to chapter below ["register (Lines 44-47)"](#register (Lines 44-47)) 
+The first command is set to take the content of the variable "$RegistrationCode" and process it for later use. The content of this variable are whatever is entered  in the NEEO app or the web UI during the second page of the registration process as "security code". Also refer to chapter below [register (Lines 44-47)](#register) 
 
+.\
+.\
+.\
+.\
+.\
+.\
+.\
+.\
+.\
+.\
+.\
+.\
+.\
+.\
+.\
+.\
+.\
+.\
+.\
 
-
-#### register (Lines 44-47)
+#### register
 ```javascript
 44  "register":{
 45    "registerheadertext": "Shelly",
