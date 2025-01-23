@@ -46,7 +46,7 @@ Note: In the case of simpler drivers for controlling only one device, the above-
 ```
 </details>
 
-The header of the driver (here lines 1-5) must contain at least the describing attributes of the driver. These are:\
+The header of the driver (here lines 1-5) must contain at least the describing attributes of the driver. These are:
 - name: \<Name of the Driver\>
 - manufacturer: \<Name of the Device Manufacturer\>
 - version: \<Ascending whole number\> Will be forwarded and processed by the neeo brain and visible in the neeo app. Please note: raising the version number will tell the neeo brain to update the driver features, such as buttons, labels, sliders etc. However, with the following driver structure split into "discover" and "template" this feature does NOT work. Devices with drivers split like that must be removed and reinstallled to the neeo brain to fully update all features (new or reanamed buttons etc.).
@@ -66,7 +66,7 @@ The header of the driver (here lines 1-5) must contain at least the describing a
 ```
 </details>
 
-The persistedvariables are a set of variables that can be stored in a persistent memory for later use. All persisted variables currently in can be saved by triggering the hidden button “__PERSIST”. This driver uses:\
+The persistedvariables are a set of variables that can be stored in a persistent memory for later use. All persisted variables currently in can be saved by triggering the hidden button “__PERSIST”. This driver uses:
 - IsRegistered: \<false\> This variable is forwarded to the NEEO SDK. False triggers the registration process (e.g. entering "security code") when a new device is added in the app.
 - ToInitiate: \<true\> Must be true for the registration process to work properly.
 - MyDevices: This is the variable in which all devices that are compatible with this driver are stored. 
