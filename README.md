@@ -101,7 +101,7 @@ This device is also capable of power metering (PM).
 *planned for the end of Q2 2025*
 
 ## Driver Walkthrough for interested Developers (Tutorial)
-It is planned to write a walkthroug of the driver "Shelly Plus 2PM (Mode: Switch)" in Version 1 as a tutorial. This can follow at a later stage.
+If you are an interested developer or user you can have a look at the walkthrough of the driver "Shelly Plus 2PM (Mode: Switch)" in Version 1 i created. In this [tutorial](https://github.com/MarkusMas/meta-shelly-gen2/blob/main/tutorial/shelly-plus-2pm_switch_v1_tutorial.md) i am going through all the details of the driver.
 
 ## ToDos
 - Add "digest authentication" so password protected Shellys can be used.
