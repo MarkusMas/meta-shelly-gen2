@@ -20,7 +20,7 @@ The driver uses the following structure and elements:
  6  "persistedvariables":{...},
 11  "variables": {...},
 18  "discover":  {...},
-23  "register":  {...},
+43  "register":  {...},
 48  "template":  {...}
 96  }
 ```
@@ -112,7 +112,7 @@ Variables are parameters that are used during the running time of meta. If meta 
 In "discover" the content of the first page of the regestration process in the NEEO app is set up. In in addition, a set of three commands ("initcommandset") is chained that are to be executed prior to proceeding with registration.
 
 ##### Processing $RegistrationCode
-The first command is set to take the content of the variable "$RegistrationCode" and process it for later use. The content of this variable are whatever is entered  in the NEEO app or the web UI during the second page of the registration process as "security code". Also refer to chapter below [register (Lines 44-47)](#register) 
+The first command is set to take the content of the variable "$RegistrationCode" and process it for later use. The content of this variable are whatever is entered  in the NEEO app or the web UI during the second page of the registration process as "security code". Also refer to chapter below [register (Lines 43-47)](#register-(Lines-43-47)) 
 
 .\
 .\
@@ -134,13 +134,13 @@ The first command is set to take the content of the variable "$RegistrationCode"
 .\
 .\
 
-#### register
+#### register (Lines 43-47)
 ```javascript
-44  "register":{
-45    "registerheadertext": "Shelly",
-46    "registerdescription": "Please enter the IP Adress of your Shelly device. \n For example: 192.168.178.1 \n Port 80 is used by default. Add the port if different.",
-47    "command": {"type": "static", "command": ".", "queryresult": "$.*"}
-48  },
+43  "register":{
+44    "registerheadertext": "Shelly",
+45    "registerdescription": "Please enter the IP Adress of your Shelly device. \n For example: 192.168.178.1 \n Port 80 is used by default. Add the port if different.",
+46    "command": {"type": "static", "command": ".", "queryresult": "$.*"}
+47  },
 ```
 
 In "register" the content of the second page of the regestration process in the NEEO app is set up.
