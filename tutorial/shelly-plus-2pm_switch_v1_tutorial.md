@@ -277,11 +277,11 @@ At the bottom of this second page of the registration process, the “security c
 ```
 </details>
 
-The template is the actual code of the driver that is used during the operation of the device. It also contains the name and id of the device.
+The "template" is the actual code of the driver that is used during the operation of the device. It also contains the name and id of the device.
 
-In the beginning some variables are set:
+In the beginning we need to set the name and id of the driver respectivly the device instance (this driver can be used with multiple devices simultaniously):
 - dynamicname: This is the name that will be displayed in the registration process (list of compatible devices). For that the $RESULT (previously $MyDevices) is evaluated. Using "DYNAMIK_INST_START" as a prefix in a value is telling meta to look at the $Result of the registration process for that.
-- dynamicid: This is the id of the device, which helps meta to distinguish between different devices.
+- dynamicid: This is the id of the device, which helps meta to distinguish between different devices. We are using the IP adress here.
 
 #### variables (Lines 51-60)
 <details>
@@ -301,3 +301,28 @@ In the beginning some variables are set:
 ```
 </details>
 
+Variables are parameters that are used during the running time of meta. If meta is restarted, the values are reset to the values defined here.
+- ShellyURI: IP address Shelly device as obtained from the variable $MyDevices.
+- ShellyPort: Port of the Shelly device as obtained from the variable $MyDevices.
+- Switch0Output: Creating a new (boolean) variable to keep track of the output state of switch 0 (same for switch 1).
+- Switch0Status: Creating a new (string) variable to keep track of the status of switch 0 to be displayed in a label (same for switch 1).
+- Switch0ActionStatus: Creating a new (string) variable to keep track of the action status of switch 0 to be displayed in a label (same for switch 1).
+
+#### labels (Lines 61-64)
+<details>
+  <summary>click to see code:</summary>
+ 
+```javascript
+61    "labels":{
+62      "StatusSwitch0": {"label":"SWITCH 0", "listen":"Switch0Status", "actionlisten":"Switch0ActionStatus"},
+63      "StatusSwitch1": {"label":"SWITCH 1", "listen":"Switch1Status", "actionlisten":"Switch1ActionStatus"}
+64    },
+```
+</details>
+
+To display the state of the two built in relays of the Shelly device two labels are created.
+- label: Name of the label in the NEEO UI.
+- listen: Name of the variable with content for the label.
+- actionlisten:  Name of the variable with content that is displayed just for a split second. Than the label reverts back to the variable that is entered in "listen".
+
+...
