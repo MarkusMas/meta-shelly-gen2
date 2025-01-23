@@ -15,11 +15,6 @@
     "CompatibleModel":"[\"SNSW-002P16EU\", \"SNSW-102P16EU\"]",
     "CompatibleProfile":"switch"
   },
-  "register":{
-    "registerheadertext": "Shelly",
-    "registerdescription": "Please enter the IP Adress of your Shelly device. \n For example: 192.168.178.1 \n Port 80 is used by default. Add the port if different.",
-    "command": {"type": "static", "command": ".", "queryresult": "$.*"}
-  },
   "discover": {
     "welcomeheadertext": "Shelly Plus 2PM in Switch Mode",
     "welcomedescription":"powered by meta v2 \n by JAC459 \n X \n Driver Development \n by MarkusM",
@@ -44,6 +39,11 @@
       "evaldo":[{"test":"DYNAMIK let device = $NewDevice; $CompatibleModel.includes(device?.model) && \"$CompatibleProfile\" == device?.profile && device?.auth_en == false; ","then":"__PERSIST", "or":""}]
       }],
       "command": {"type": "static", "command": "$MyDevices", "queryresult": "$.*"}
+  },
+  "register":{
+    "registerheadertext": "Shelly",
+    "registerdescription": "Please enter the IP Adress of your Shelly device. \n For example: 192.168.178.1 \n Port 80 is used by default. Add the port if different.",
+    "command": {"type": "static", "command": ".", "queryresult": "$.*"}
   },
   "template":{
     "dynamicname":"DYNAMIK_INST_START DYNAMIK JSON.parse(\"$Result\").name DYNAMIK_INST_END",
