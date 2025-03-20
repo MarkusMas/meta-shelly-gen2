@@ -87,6 +87,10 @@ Known Issue/ limitation: Due to a known bug in the original firmware of the remo
 #### Versions
 ##### Version 1
 - First release
+  
+##### Version 2
+- Rewritten from the ground up so that the websocket protocol is now used (in preparation to implement authentication).
+- Same features as in version 1.
 
 ### In the Pipeline: Shelly Plus 2PM (Mode: Cover)
 The Shelly device ["Shelly Plus 2PM"](https://www.shelly.com/products/shelly-plus-2pm) contains two relays and is capable of power metering (PM) each channel. It can either be set to use both relays independently switch mode or it can be set to control covers/ blinds.\
