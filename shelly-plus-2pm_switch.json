@@ -51,18 +51,19 @@
     "variables":{
       "ShellyURI": "DYNAMIK_INST_START DYNAMIK JSON.parse(\"$Result\").ip   DYNAMIK_INST_END",
       "ShellyPort":"DYNAMIK_INST_START DYNAMIK JSON.parse(\"$Result\").port DYNAMIK_INST_END",
+      "AsyncMessage":"",
       "Switch0Output":false,
       "Switch1Output":false,
-      "Switch0Status":"",
-      "Switch1Status":"",
-      "Switch0ActionStatus":"",
-      "Switch1ActionStatus":""
+      "Switch0Status":"{\"apower\" : \"\", \"current\" : \"\", \"voltage\" : \"\"}",
+      "Switch1Status":"{\"apower\" : \"\", \"current\" : \"\", \"voltage\" : \"\"}",
+      "Switch0Label":"",
+      "Switch1Label":"",     
+      "Switch0ActionLabel":"",
+      "Switch1ActionLabel":"",
+      "SwitchActuated":"none",
+      "PrepActionStatus":"[]"
     },
-    "labels":{
-      "StatusSwitch0": {"label":"SWITCH 0", "listen":"Switch0Status", "actionlisten":"Switch0ActionStatus"},
-      "StatusSwitch1": {"label":"SWITCH 1", "listen":"Switch1Status", "actionlisten":"Switch1ActionStatus"}
-    },
-    "listeners":{
+    "listeners_old":{
       "ShellySwitch0" : {"type":"http-get", "isHub":false, "command": "http://$ShellyURI:$ShellyPort/rpc/Switch.GetStatus?id=0", "pooltime":"3000", "poolduration":"",
         "evalwrite": [
           {"variable": "Switch0Output", "value": "DYNAMIK JSON.parse(\"$Result\").output" },
@@ -76,21 +77,55 @@
         ]
       }
     },
+    "listeners":{
+      "SamsungListener": {"type":"webSocket", "command":{"connection":"ws://$ShellyURI:$ShellyPort/rpc", "message": "message"}, "queryresult" : "",
+        "evalwrite":[
+          {"variable":"AsyncMessage",      "value":"DYNAMIK \"$Result\" "},
+          {"variable":"Switch0Output",     "value":"DYNAMIK let output = $Switch0Output; let params = $AsyncMessage.params ? $AsyncMessage.params['switch:0'] : $AsyncMessage.result; if (params && params.id === 0 && 'output' in params) {output = params.output;} else {$Switch0Output}"},
+          {"variable":"Switch1Output",     "value":"DYNAMIK let output = $Switch1Output; let params = $AsyncMessage.params ? $AsyncMessage.params['switch:1'] : $AsyncMessage.result; if (params && params.id === 1 && 'output' in params) {output = params.output;} else {$Switch1Output}"},
+          {"variable":"Switch0Status",     "value":"DYNAMIK let data =   $Switch0Status; let params = $AsyncMessage.params ? $AsyncMessage.params['switch:0'] : $AsyncMessage.result; if (params && params.id === 0) {if ('apower' in params) data.apower = params.apower; if ('current' in params) data.current = params.current; if ('voltage' in params) data.voltage = params.voltage;} data=JSON.stringify(data); "},
+          {"variable":"Switch1Status",     "value":"DYNAMIK let data =   $Switch1Status; let params = $AsyncMessage.params ? $AsyncMessage.params['switch:1'] : $AsyncMessage.result; if (params && params.id === 1) {if ('apower' in params) data.apower = params.apower; if ('current' in params) data.current = params.current; if ('voltage' in params) data.voltage = params.voltage;} data=JSON.stringify(data); "},
+          {"variable":"Switch0Label",      "value":"DYNAMIK ($Switch0Output ? \"ON - \" : \"OFF - \") + $Switch0Status.apower.toFixed(1) + \" W - \" + $Switch0Status.current.toFixed(3) + \" A - \" + $Switch0Status.voltage.toFixed(1) + \" V\" "},
+          {"variable":"Switch1Label",      "value":"DYNAMIK ($Switch1Output ? \"ON - \" : \"OFF - \") + $Switch1Status.apower.toFixed(1) + \" W - \" + $Switch1Status.current.toFixed(3) + \" A - \" + $Switch1Status.voltage.toFixed(1) + \" V\" "},
+          {"variable":"Switch0ActionLabel","value":"DYNAMIK let res; let prep; if ('result' in $AsyncMessage && 'was_on' in $AsyncMessage.result && $SwitchActuated == 0) {res = $AsyncMessage.result.was_on; prep = $PrepActionStatus; res ? prep[0] : (res==false ? prep[1] : prep[2] ) ;} else {\"$Switch0ActionLabel\"}"},
+          {"variable":"Switch1ActionLabel","value":"DYNAMIK let res; let prep; if ('result' in $AsyncMessage && 'was_on' in $AsyncMessage.result && $SwitchActuated == 1) {res = $AsyncMessage.result.was_on; prep = $PrepActionStatus; res ? prep[0] : (res==false ? prep[1] : prep[2] ) ;} else {\"$Switch1ActionLabel\"}"}
+        ]
+      },
+      "InitialGetStatus": {"type":"static", "command":"", "pooltime":"3000", "poolduration":"3000", "queryresult": "",
+        "evaldo":[
+          {"test":true, "then":"__GetStatus0", "or":""},
+          {"test":true, "then":"__GetStatus1", "or":""}
+        ]
+      }      ,
+      "PollGetStatus": {"type":"static", "command":"", "pooltime":"60000", "poolduration":"", "queryresult": "",
+        "evaldo":[
+          {"test":true, "then":"__GetStatus0", "or":""},
+          {"test":true, "then":"__GetStatus1", "or":""}
+        ]
+      }
+    },
+    "labels":{
+      "StatusSwitch0": {"label":"SWITCH 0", "listen":"Switch0Label", "actionlisten":"Switch0ActionLabel"},
+      "StatusSwitch1": {"label":"SWITCH 1", "listen":"Switch1Label", "actionlisten":"Switch1ActionLabel"}
+    },
     "switches":{
-      "Switch0" : {"label":"SWITCH 0", "listen":"Switch0Output", "evaldo":[{"test":"DYNAMIK $Switch0Output", "then":"SWITCH 0 ON", "or":"SWITCH 0 OFF"}]},
-      "Switch1" : {"label":"SWITCH 1", "listen":"Switch1Output", "evaldo":[{"test":"DYNAMIK $Switch1Output", "then":"SWITCH 1 ON", "or":"SWITCH 1 OFF"}]}
+      "Switch0": {"label":"SWITCH 0", "listen":"Switch0Output", "evaldo":[{"test":"DYNAMIK $Switch0Output", "then":"SWITCH 0 ON", "or":"SWITCH 0 OFF"}]},
+      "Switch1": {"label":"SWITCH 1", "listen":"Switch1Output", "evaldo":[{"test":"DYNAMIK $Switch1Output", "then":"SWITCH 1 ON", "or":"SWITCH 1 OFF"}]}
     },
     "buttons":{
-      "POWER ON":    {"label":"", "type":"static",   "command":"", "evaldo":[{"test":true,"then":"__INITIALISE", "or":""}]},
-      "POWER OFF":   {"label":"", "type":"static",   "command":"", "evaldo":[{"test":true,"then":"__CLEANUP",    "or":""}]},
+      "POWER ON":  {"label":"", "type":"static", "command":"", "evaldo":[{"test":true,"then":"__INITIALISE", "or":""}]},
+      "POWER OFF": {"label":"", "type":"static", "command":"", "evaldo":[{"test":true,"then":"__CLEANUP",    "or":""}]},
 
-      "SWITCH 0 ON":     {"label":"", "type":"http-get", "command":"http://$ShellyURI:$ShellyPort/rpc/Switch.Set?id=0&on=true", "evalwrite":[{"variable":"Switch0ActionStatus", "value":"DYNAMIK JSON.parse(\"$Result\").was_on==true ? \"stays on\"   : (JSON.parse(\"$Result\").was_on==false ? \"turned on\" : \"Command failed\") "}] },
-      "SWITCH 0 OFF":    {"label":"", "type":"http-get", "command":"http://$ShellyURI:$ShellyPort/rpc/Switch.Set?id=0&on=false","evalwrite":[{"variable":"Switch0ActionStatus", "value":"DYNAMIK JSON.parse(\"$Result\").was_on==true ? \"turned off\" : (JSON.parse(\"$Result\").was_on==false ? \"stays off\" : \"Command failed\") "}] },
-      "SWITCH 0 TOGGLE": {"label":"", "type":"http-get", "command":"http://$ShellyURI:$ShellyPort/rpc/Switch.Toggle?id=0",      "evalwrite":[{"variable":"Switch0ActionStatus", "value":"DYNAMIK JSON.parse(\"$Result\").was_on==true ? \"turned off\" : (JSON.parse(\"$Result\").was_on==false ? \"turned on\" : \"Command failed\") "}] },
+      "__GetStatus0":    {"type":"webSocket", "command":{"connection":"ws://$ShellyURI:$ShellyPort/rpc", "message":{"id":2, "src":"neeo", "method":"Switch.GetStatus", "params":{"id":0}}}},
+      "__GetStatus1":    {"type":"webSocket", "command":{"connection":"ws://$ShellyURI:$ShellyPort/rpc", "message":{"id":2, "src":"neeo", "method":"Switch.GetStatus", "params":{"id":1}}}},
 
-      "SWITCH 1 ON":     {"label":"", "type":"http-get", "command":"http://$ShellyURI:$ShellyPort/rpc/Switch.Set?id=1&on=true", "evalwrite":[{"variable":"Switch1ActionStatus", "value":"DYNAMIK JSON.parse(\"$Result\").was_on==true ? \"stays on\"   : (JSON.parse(\"$Result\").was_on==false ? \"turned on\" : \"Command failed\") "}] },
-      "SWITCH 1 OFF":    {"label":"", "type":"http-get", "command":"http://$ShellyURI:$ShellyPort/rpc/Switch.Set?id=1&on=false","evalwrite":[{"variable":"Switch1ActionStatus", "value":"DYNAMIK JSON.parse(\"$Result\").was_on==true ? \"turned off\" : (JSON.parse(\"$Result\").was_on==false ? \"stays off\" : \"Command failed\") "}] },
-      "SWITCH 1 TOGGLE": {"label":"", "type":"http-get", "command":"http://$ShellyURI:$ShellyPort/rpc/Switch.Toggle?id=1",      "evalwrite":[{"variable":"Switch1ActionStatus", "value":"DYNAMIK JSON.parse(\"$Result\").was_on==true ? \"turned off\" : (JSON.parse(\"$Result\").was_on==false ? \"turned on\" : \"Command failed\") "}] }
+      "SWITCH 0 ON":     {"type":"webSocket", "command":{"connection":"ws://$ShellyURI:$ShellyPort/rpc", "message":{"id":2, "src":"neeo", "method":"Switch.Set",    "params":{"id":0, "on":true}}  }, "evalwrite":[{"variable":"SwitchActuated", "value": "0"}, {"variable":"PrepActionStatus", "value":"[\"stays on\",   \"turned on\", \"Command failed\"]" }]},
+      "SWITCH 0 OFF":    {"type":"webSocket", "command":{"connection":"ws://$ShellyURI:$ShellyPort/rpc", "message":{"id":2, "src":"neeo", "method":"Switch.Set",    "params":{"id":0, "on":false}} }, "evalwrite":[{"variable":"SwitchActuated", "value": "0"}, {"variable":"PrepActionStatus", "value":"[\"turned off\", \"stays off\", \"Command failed\"]" }]},
+      "SWITCH 0 TOGGLE": {"type":"webSocket", "command":{"connection":"ws://$ShellyURI:$ShellyPort/rpc", "message":{"id":2, "src":"neeo", "method":"Switch.Toggle", "params":{"id":0}}             }, "evalwrite":[{"variable":"SwitchActuated", "value": "0"}, {"variable":"PrepActionStatus", "value":"[\"turned off\", \"turned on\", \"Command failed\"]" }]},
+
+      "SWITCH 1 ON":     {"type":"webSocket", "command":{"connection":"ws://$ShellyURI:$ShellyPort/rpc", "message":{"id":2, "src":"neeo", "method":"Switch.Set",    "params":{"id":1, "on":true}}  }, "evalwrite":[{"variable":"SwitchActuated", "value": "1"}, {"variable":"PrepActionStatus", "value":"[\"stays on\",   \"turned on\", \"Command failed\"]" }]},
+      "SWITCH 1 OFF":    {"type":"webSocket", "command":{"connection":"ws://$ShellyURI:$ShellyPort/rpc", "message":{"id":2, "src":"neeo", "method":"Switch.Set",    "params":{"id":1, "on":false}} }, "evalwrite":[{"variable":"SwitchActuated", "value": "1"}, {"variable":"PrepActionStatus", "value":"[\"turned off\", \"stays off\", \"Command failed\"]" }]},
+      "SWITCH 1 TOGGLE": {"type":"webSocket", "command":{"connection":"ws://$ShellyURI:$ShellyPort/rpc", "message":{"id":2, "src":"neeo", "method":"Switch.Toggle", "params":{"id":1}}             }, "evalwrite":[{"variable":"SwitchActuated", "value": "1"}, {"variable":"PrepActionStatus", "value":"[\"turned off\", \"turned on\", \"Command failed\"]" }]}
     }
   }
 }
