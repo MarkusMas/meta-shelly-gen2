@@ -9,7 +9,7 @@ The drivers in this repository make use of the [Shelly Device Api for Gen2+](htt
 Further requirement: The IP addresses of your Shelly devices must be fixed!
 
 #### Authentication
-Shelly devices can be additionaly proteced by setting a password for each individual device. This password can be set (and/or removed) by accessing the following page using a web browser: `http://\<shelly-ip\>/#/settings/authentication`
+Shelly devices can be additionaly proteced by setting a password for each individual device. This password can be set (and/or removed) by accessing the following page using a web browser: `http://<shelly-ip>/#/settings/authentication`
 
 Authentication is NOT supported for now. This means that Shelly devices for which a password has been set for authentication are NOT compatible for the time being. This functionality may be added at a later stage.
 
