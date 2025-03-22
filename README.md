@@ -4,7 +4,7 @@ This repository contains a set of drivers to control Shelly devices of Gen2 upwa
 For Shelly devices of Gen1 please refer to the repository [meta-shelly-driver](https://github.com/vistalba/meta-shelly-driver) by @vistalba.
 
 ### Device Compatibility
-The drivers in this repository make use of the [Shelly Device Api for Gen2+](https://shelly-api-docs.shelly.cloud/gen2/) using the RPC protocol. The compatibility of your Shelly devices is automatically checked during step 12 of the instructions below. All your compatible devices will be listed for installation.
+The drivers in this repository make use of the [Shelly Device Api for Gen2+](https://shelly-api-docs.shelly.cloud/gen2/) using the RPC protocol ~~ via http protocoll~~  _update shelly plus 2pm v2:_ via a websocket connection). The compatibility of your Shelly devices is automatically checked during step 12 of the instructions below. All your compatible devices will be listed for installation.
 
 Further requirement: The IP addresses of your Shelly devices must be fixed!
 
