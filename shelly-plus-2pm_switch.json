@@ -1,6 +1,6 @@
 { "name":"Shelly Plus 2PM (Mode: Switch)", 
   "manufacturer":"Shelly",
-  "version":2,
+  "version":3,
   "compatible-meta":"1.0.5",
   "type":"MUSICPLAYER",
   "persistedvariables":{
@@ -12,8 +12,14 @@
     "NewDevice":"[]",
     "NewUri": "",
     "NewPort":"",
+    "NewPassword":"",
     "CompatibleModel":"[\"SNSW-002P16EU\", \"SNSW-102P16EU\"]",
     "CompatibleProfile":"switch"
+  },
+  "register":{
+    "registerheadertext": "Shelly",
+    "registerdescription": "Please enter the IP address of your Shelly device. \n For example: 192.168.178.1 \n If you have activated authentication please use the following format: \n password@192.168.178.1 \n Port 80 is used by default. Add the port if different.",
+    "command": {"type": "static", "command": ".", "queryresult": "$.*"}
   },
   "discover": {
     "welcomeheadertext": "Shelly Plus 2PM in Switch Mode",
@@ -24,9 +30,10 @@
       "command":"$RegistrationCode",
       "queryresult":"",
       "evalwrite":[
-        {"variable":"NewDevice", "value":"DYNAMIK let device = {\"ip\":\"\", \"port\":\"\", \"model\":\"\", \"name\":\"\", \"mac_address\":\"\", \"profile\":\"\", \"auth_en\":\"\" }; device.ip = \"$Result\".split(\":\")[0]; device.port = (\"$Result\".split(\":\")[1]!=undefined?\"$Result\".split(\":\")[1]:\"80\"); JSON.stringify(device); "},
-        {"variable":"NewUri",    "value":"DYNAMIK \"$Result\".split(\":\")[0] "},
-        {"variable":"NewPort",   "value":"DYNAMIK \"$Result\".split(\":\")[1]!=undefined?\"$Result\".split(\":\")[1]:\"80\"; "}
+        {"variable":"NewDevice",   "value":"DYNAMIK let device = {\"ip\":\"\", \"port\":\"\", \"model\":\"\", \"name\":\"\", \"mac_address\":\"\", \"profile\":\"\", \"auth_en\":\"\", \"password\":\"\"}; device.ip = (\"$Result\".split(\"@\")[1]!=undefined ? \"$Result\".split(\"@\")[1].split(\":\")[0] : \"$Result\".split(\":\")[0]); device.port = (\"$Result\".split(\":\")[1]!=undefined ? \"$Result\".split(\":\")[1] : \"80\"); device.password = (\"$Result\".split(\"@\")[1]!=undefined ? \"$Result\".split(\"@\")[0] : undefined); JSON.stringify(device); "},
+        {"variable":"NewUri",      "value":"DYNAMIK \"$Result\".split(\"@\")[1]!=undefined ? \"$Result\".split(\"@\")[1].split(\":\")[0] : \"$Result\".split(\":\")[0] "},
+        {"variable":"NewPort",     "value":"DYNAMIK \"$Result\".split(\":\")[1]!=undefined ? \"$Result\".split(\":\")[1] : \"80\" "},
+        {"variable":"NewPassword", "value":"DYNAMIK \"$Result\".split(\"@\")[1]!=undefined ? \"$Result\".split(\"@\")[0] : undefined "}
       ]
       },{
       "type":"http-get",
@@ -34,23 +41,23 @@
       "queryresult" : "$.",
       "evalwrite":[
         {"variable":"NewDevice", "value":"DYNAMIK let device = $NewDevice; device.name = (JSON.parse(\"$Result\").name == null ? \"Shelly Plus 2PM \"+device.ip : JSON.parse(\"$Result\").name); device.model = JSON.parse(\"$Result\").model; device.mac_address=JSON.parse(\"$Result\").mac; device.profile=JSON.parse(\"$Result\").profile; device.auth_en=JSON.parse(\"$Result\").auth_en; JSON.stringify(device); "},
-        {"variable":"MyDevices", "value":"DYNAMIK let device = $NewDevice; let mydevices = $MyDevices; device?.name != undefined && $CompatibleModel.includes(device?.model) && \"$CompatibleProfile\" == device?.profile && device?.auth_en == false ? ( (mydevices=mydevices || []).some(i=>i.ip==device.ip) ? mydevices[mydevices.findIndex(i=>i.ip==device.ip)]=device : mydevices.push(device) ) : mydevices ; JSON.stringify(mydevices); "}
+        {"variable":"MyDevices", "value":"DYNAMIK let device = $NewDevice; let mydevices = $MyDevices; device?.name != undefined && $CompatibleModel.includes(device?.model) && \"$CompatibleProfile\" == device?.profile && device?.auth_en == ($NewPassword != undefined ? true : false) ? ( (mydevices=mydevices || []).some(i=>i.ip==device.ip) ? mydevices[mydevices.findIndex(i=>i.ip==device.ip)]=device : mydevices.push(device) ) : mydevices ; JSON.stringify(mydevices); "}
       ],
-      "evaldo":[{"test":"DYNAMIK let device = $NewDevice; $CompatibleModel.includes(device?.model) && \"$CompatibleProfile\" == device?.profile && device?.auth_en == false; ","then":"__PERSIST", "or":""}]
+      "evaldo":[{"test":"DYNAMIK let device = $NewDevice; $CompatibleModel.includes(device?.model) && \"$CompatibleProfile\" == device?.profile && device?.auth_en == ($NewPassword != undefined ? true : false); ","then":"__PERSIST", "or":""}]
       }],
       "command": {"type": "static", "command": "$MyDevices", "queryresult": "$.*"}
-  },
-  "register":{
-    "registerheadertext": "Shelly",
-    "registerdescription": "Please enter the IP Adress of your Shelly device. \n For example: 192.168.178.1 \n Port 80 is used by default. Add the port if different.",
-    "command": {"type": "static", "command": ".", "queryresult": "$.*"}
   },
   "template":{
     "dynamicname":"DYNAMIK_INST_START DYNAMIK JSON.parse(\"$Result\").name DYNAMIK_INST_END",
     "dynamicid":  "DYNAMIK_INST_START DYNAMIK JSON.parse(\"$Result\").ip   DYNAMIK_INST_END",
     "variables":{
-      "ShellyURI": "DYNAMIK_INST_START DYNAMIK JSON.parse(\"$Result\").ip   DYNAMIK_INST_END",
-      "ShellyPort":"DYNAMIK_INST_START DYNAMIK JSON.parse(\"$Result\").port DYNAMIK_INST_END",
+      "ShellyURI":    "DYNAMIK_INST_START DYNAMIK JSON.parse(\"$Result\").ip       DYNAMIK_INST_END",
+      "ShellyPort":   "DYNAMIK_INST_START DYNAMIK JSON.parse(\"$Result\").port     DYNAMIK_INST_END",
+      "ShellyPass":   "DYNAMIK_INST_START DYNAMIK JSON.parse(\"$Result\").password DYNAMIK_INST_END",
+      "ShellyAuth_en":"DYNAMIK_INST_START DYNAMIK JSON.parse(\"$Result\").auth_en  DYNAMIK_INST_END",
+      "ShellyAuthDet":"{\"auth_type\" : \"\", \"nonce\" : \"\", \"nc\" : \"\", \"realm\" : \"\", \"algorithm\" : \"\"}",
+      "NeeoAuthDet":  "{\"username\" : \"admin\", \"cnonce\" : \"\", \"ha1\" : \"\", \"ha2\" : \"\", \"ha\" : \"\"}",
+      "Authenticated":false,
       "AsyncMessage":"",
       "Switch0Output":false,
       "Switch1Output":false,
@@ -67,17 +74,20 @@
       "SamsungListener": {"type":"webSocket", "command":{"connection":"ws://$ShellyURI:$ShellyPort/rpc", "message": "message"}, "queryresult" : "",
         "evalwrite":[
           {"variable":"AsyncMessage",      "value":"DYNAMIK \"$Result\" "},
+          {"variable":"ShellyAuthDet",     "value":"DYNAMIK let s = $ShellyAuthDet; let error = $AsyncMessage.error; if (error && error.code === 401) {let m = JSON.parse(error?.message); if ('auth_type' in m) s.auth_type = m.auth_type; if ('nonce' in m) s.nonce = m.nonce; if ('nc' in m) s.nc = m.nc; if ('realm' in m) s.realm = m.realm; if ('algorithm' in m) s.algorithm = m.algorithm;} s=JSON.stringify(s); "},
+          {"variable":"NeeoAuthDet",       "value":"DYNAMIK let s = $ShellyAuthDet; let n = $NeeoAuthDet; if ($ShellyAuth_en && !!s.nonce && !$Authenticated) {let crypto = require('crypto'); let auth_parts = [n.username, s.realm, $ShellyPass]; n.ha1 = crypto.createHash('sha256').update(auth_parts.join(':')).digest('hex'); let auth = 'auth'; n.ha2 = crypto.createHash('sha256').update('dummy_method:dummy_uri').digest('hex'); auth_parts = [n.ha1, s.nonce, s.nc, n.cnonce, auth, n.ha2]; n.ha = crypto.createHash('sha256').update(auth_parts.join(':')).digest('hex');}; n=JSON.stringify(n);" },
+          {"variable":"Authenticated",     "value":"DYNAMIK let n = $NeeoAuthDet; !!n.ha"},
           {"variable":"Switch0Output",     "value":"DYNAMIK let output = $Switch0Output; let params = $AsyncMessage.params ? $AsyncMessage.params['switch:0'] : $AsyncMessage.result; if (params && params.id === 0 && 'output' in params) {output = params.output;} else {$Switch0Output}"},
           {"variable":"Switch1Output",     "value":"DYNAMIK let output = $Switch1Output; let params = $AsyncMessage.params ? $AsyncMessage.params['switch:1'] : $AsyncMessage.result; if (params && params.id === 1 && 'output' in params) {output = params.output;} else {$Switch1Output}"},
           {"variable":"Switch0Status",     "value":"DYNAMIK let data =   $Switch0Status; let params = $AsyncMessage.params ? $AsyncMessage.params['switch:0'] : $AsyncMessage.result; if (params && params.id === 0) {if ('apower' in params) data.apower = params.apower; if ('current' in params) data.current = params.current; if ('voltage' in params) data.voltage = params.voltage;} data=JSON.stringify(data); "},
           {"variable":"Switch1Status",     "value":"DYNAMIK let data =   $Switch1Status; let params = $AsyncMessage.params ? $AsyncMessage.params['switch:1'] : $AsyncMessage.result; if (params && params.id === 1) {if ('apower' in params) data.apower = params.apower; if ('current' in params) data.current = params.current; if ('voltage' in params) data.voltage = params.voltage;} data=JSON.stringify(data); "},
-          {"variable":"Switch0Label",      "value":"DYNAMIK ($Switch0Output ? \"ON - \" : \"OFF - \") + $Switch0Status.apower.toFixed(1) + \" W - \" + $Switch0Status.current.toFixed(3) + \" A - \" + $Switch0Status.voltage.toFixed(1) + \" V\" "},
-          {"variable":"Switch1Label",      "value":"DYNAMIK ($Switch1Output ? \"ON - \" : \"OFF - \") + $Switch1Status.apower.toFixed(1) + \" W - \" + $Switch1Status.current.toFixed(3) + \" A - \" + $Switch1Status.voltage.toFixed(1) + \" V\" "},
+          {"variable":"Switch0Label",      "value":"DYNAMIK let error = $AsyncMessage.error; if (error && error.code === 401) {\"Check authentication\"} else {($Switch0Output ? \"ON - \" : \"OFF - \") + Number($Switch0Status.apower).toFixed(1) + \" W - \" + Number($Switch0Status.current).toFixed(3) + \" A - \" + Number($Switch0Status.voltage).toFixed(1) + \" V\"} "},
+          {"variable":"Switch1Label",      "value":"DYNAMIK let error = $AsyncMessage.error; if (error && error.code === 401) {\"Check authentication\"} else {($Switch1Output ? \"ON - \" : \"OFF - \") + Number($Switch1Status.apower).toFixed(1) + \" W - \" + Number($Switch1Status.current).toFixed(3) + \" A - \" + Number($Switch1Status.voltage).toFixed(1) + \" V\"} "},
           {"variable":"Switch0ActionLabel","value":"DYNAMIK let res; let prep; if ('result' in $AsyncMessage && 'was_on' in $AsyncMessage.result && $SwitchActuated == 0) {res = $AsyncMessage.result.was_on; prep = $PrepActionStatus; res ? prep[0] : (res==false ? prep[1] : prep[2] ) ;} else {\"$Switch0ActionLabel\"}"},
           {"variable":"Switch1ActionLabel","value":"DYNAMIK let res; let prep; if ('result' in $AsyncMessage && 'was_on' in $AsyncMessage.result && $SwitchActuated == 1) {res = $AsyncMessage.result.was_on; prep = $PrepActionStatus; res ? prep[0] : (res==false ? prep[1] : prep[2] ) ;} else {\"$Switch1ActionLabel\"}"}
         ]
       },
-      "InitialGetStatus": {"type":"static", "command":"", "pooltime":"3000", "poolduration":"3000", "queryresult": "",
+      "InitialGetStatus": {"type":"static", "command":"", "pooltime":"1000", "poolduration":"2100", "queryresult": "",
         "evaldo":[
           {"test":true, "then":"__GetStatus0", "or":""},
           {"test":true, "then":"__GetStatus1", "or":""}
@@ -99,19 +109,19 @@
       "Switch1": {"label":"SWITCH 1", "listen":"Switch1Output", "evaldo":[{"test":"DYNAMIK $Switch1Output", "then":"SWITCH 1 ON", "or":"SWITCH 1 OFF"}]}
     },
     "buttons":{
-      "POWER ON":  {"label":"", "type":"static", "command":"", "evaldo":[{"test":true,"then":"__INITIALISE", "or":""}]},
-      "POWER OFF": {"label":"", "type":"static", "command":"", "evaldo":[{"test":true,"then":"__CLEANUP",    "or":""}]},
+      "POWER ON":  {"label":"", "type":"static", "command":"", "evaldo":[{"test":true,"then":"__INITIALISE", "or":""}],"evalwrite":[{"variable":"NeeoAuthDet",  "value": "DYNAMIK let n = $NeeoAuthDet; n.cnonce = String(Math.floor(Math.random()*10e8)); n=JSON.stringify(n)"}]},
+      "POWER OFF": {"label":"", "type":"static", "command":"", "evaldo":[{"test":true,"then":"__CLEANUP",    "or":""}],"evalwrite":[{"variable":"Authenticated","value": false}]},
 
-      "__GetStatus0":    {"type":"webSocket", "command":{"connection":"ws://$ShellyURI:$ShellyPort/rpc", "message":{"id":2, "src":"neeo", "method":"Switch.GetStatus", "params":{"id":0}}}},
-      "__GetStatus1":    {"type":"webSocket", "command":{"connection":"ws://$ShellyURI:$ShellyPort/rpc", "message":{"id":2, "src":"neeo", "method":"Switch.GetStatus", "params":{"id":1}}}},
+      "__GetStatus0":    {"type":"webSocket", "command":"DYNAMIK let s = $ShellyAuthDet; let n = $NeeoAuthDet; let req = {\"connection\":\"ws://$ShellyURI:$ShellyPort/rpc\", \"message\":{\"id\":2, \"src\":\"neeo\", \"method\":\"Switch.GetStatus\", \"params\":{\"id\":0} } }; if ($Authenticated) {let auth = {\"realm\": s.realm, \"username\": n.username, \"nonce\": s.nonce, \"cnonce\": n.cnonce, \"response\": n.ha, \"algorithm\": \"SHA-256\"}; req.message.auth = auth}; req"},
+      "__GetStatus1":    {"type":"webSocket", "command":"DYNAMIK let s = $ShellyAuthDet; let n = $NeeoAuthDet; let req = {\"connection\":\"ws://$ShellyURI:$ShellyPort/rpc\", \"message\":{\"id\":2, \"src\":\"neeo\", \"method\":\"Switch.GetStatus\", \"params\":{\"id\":1} } }; if ($Authenticated) {let auth = {\"realm\": s.realm, \"username\": n.username, \"nonce\": s.nonce, \"cnonce\": n.cnonce, \"response\": n.ha, \"algorithm\": \"SHA-256\"}; req.message.auth = auth}; req"},
 
-      "SWITCH 0 ON":     {"type":"webSocket", "command":{"connection":"ws://$ShellyURI:$ShellyPort/rpc", "message":{"id":2, "src":"neeo", "method":"Switch.Set",    "params":{"id":0, "on":true}}  }, "evalwrite":[{"variable":"SwitchActuated", "value": "0"}, {"variable":"PrepActionStatus", "value":"[\"stays on\",   \"turned on\", \"Command failed\"]" }]},
-      "SWITCH 0 OFF":    {"type":"webSocket", "command":{"connection":"ws://$ShellyURI:$ShellyPort/rpc", "message":{"id":2, "src":"neeo", "method":"Switch.Set",    "params":{"id":0, "on":false}} }, "evalwrite":[{"variable":"SwitchActuated", "value": "0"}, {"variable":"PrepActionStatus", "value":"[\"turned off\", \"stays off\", \"Command failed\"]" }]},
-      "SWITCH 0 TOGGLE": {"type":"webSocket", "command":{"connection":"ws://$ShellyURI:$ShellyPort/rpc", "message":{"id":2, "src":"neeo", "method":"Switch.Toggle", "params":{"id":0}}             }, "evalwrite":[{"variable":"SwitchActuated", "value": "0"}, {"variable":"PrepActionStatus", "value":"[\"turned off\", \"turned on\", \"Command failed\"]" }]},
+      "SWITCH 0 ON":     {"type":"webSocket", "command":"DYNAMIK let s = $ShellyAuthDet; let n = $NeeoAuthDet; let req = {\"connection\":\"ws://$ShellyURI:$ShellyPort/rpc\", \"message\":{\"id\":2, \"src\":\"neeo\", \"method\":\"Switch.Set\",    \"params\":{\"id\":0, \"on\":true}  }}; if ($Authenticated) {let auth = {\"realm\": s.realm, \"username\": n.username, \"nonce\": s.nonce, \"cnonce\": n.cnonce, \"response\": n.ha, \"algorithm\": \"SHA-256\"}; req.message.auth = auth}; req", "evalwrite":[{"variable":"SwitchActuated", "value": "0"}, {"variable":"PrepActionStatus", "value":"[\"stays on\",   \"turned on\", \"Command failed\"]" }]},
+      "SWITCH 0 OFF":    {"type":"webSocket", "command":"DYNAMIK let s = $ShellyAuthDet; let n = $NeeoAuthDet; let req = {\"connection\":\"ws://$ShellyURI:$ShellyPort/rpc\", \"message\":{\"id\":2, \"src\":\"neeo\", \"method\":\"Switch.Set\",    \"params\":{\"id\":0, \"on\":false} }}; if ($Authenticated) {let auth = {\"realm\": s.realm, \"username\": n.username, \"nonce\": s.nonce, \"cnonce\": n.cnonce, \"response\": n.ha, \"algorithm\": \"SHA-256\"}; req.message.auth = auth}; req", "evalwrite":[{"variable":"SwitchActuated", "value": "0"}, {"variable":"PrepActionStatus", "value":"[\"turned off\", \"stays off\", \"Command failed\"]" }]},
+      "SWITCH 0 TOGGLE": {"type":"webSocket", "command":"DYNAMIK let s = $ShellyAuthDet; let n = $NeeoAuthDet; let req = {\"connection\":\"ws://$ShellyURI:$ShellyPort/rpc\", \"message\":{\"id\":2, \"src\":\"neeo\", \"method\":\"Switch.Toggle\", \"params\":{\"id\":0}               }}; if ($Authenticated) {let auth = {\"realm\": s.realm, \"username\": n.username, \"nonce\": s.nonce, \"cnonce\": n.cnonce, \"response\": n.ha, \"algorithm\": \"SHA-256\"}; req.message.auth = auth}; req", "evalwrite":[{"variable":"SwitchActuated", "value": "0"}, {"variable":"PrepActionStatus", "value":"[\"turned off\", \"turned on\", \"Command failed\"]" }]},
 
-      "SWITCH 1 ON":     {"type":"webSocket", "command":{"connection":"ws://$ShellyURI:$ShellyPort/rpc", "message":{"id":2, "src":"neeo", "method":"Switch.Set",    "params":{"id":1, "on":true}}  }, "evalwrite":[{"variable":"SwitchActuated", "value": "1"}, {"variable":"PrepActionStatus", "value":"[\"stays on\",   \"turned on\", \"Command failed\"]" }]},
-      "SWITCH 1 OFF":    {"type":"webSocket", "command":{"connection":"ws://$ShellyURI:$ShellyPort/rpc", "message":{"id":2, "src":"neeo", "method":"Switch.Set",    "params":{"id":1, "on":false}} }, "evalwrite":[{"variable":"SwitchActuated", "value": "1"}, {"variable":"PrepActionStatus", "value":"[\"turned off\", \"stays off\", \"Command failed\"]" }]},
-      "SWITCH 1 TOGGLE": {"type":"webSocket", "command":{"connection":"ws://$ShellyURI:$ShellyPort/rpc", "message":{"id":2, "src":"neeo", "method":"Switch.Toggle", "params":{"id":1}}             }, "evalwrite":[{"variable":"SwitchActuated", "value": "1"}, {"variable":"PrepActionStatus", "value":"[\"turned off\", \"turned on\", \"Command failed\"]" }]}
+      "SWITCH 1 ON":     {"type":"webSocket", "command":"DYNAMIK let s = $ShellyAuthDet; let n = $NeeoAuthDet; let req = {\"connection\":\"ws://$ShellyURI:$ShellyPort/rpc\", \"message\":{\"id\":2, \"src\":\"neeo\", \"method\":\"Switch.Set\",    \"params\":{\"id\":1, \"on\":true}  }}; if ($Authenticated) {let auth = {\"realm\": s.realm, \"username\": n.username, \"nonce\": s.nonce, \"cnonce\": n.cnonce, \"response\": n.ha, \"algorithm\": \"SHA-256\"}; req.message.auth = auth}; req", "evalwrite":[{"variable":"SwitchActuated", "value": "1"}, {"variable":"PrepActionStatus", "value":"[\"stays on\",   \"turned on\", \"Command failed\"]" }]},
+      "SWITCH 1 OFF":    {"type":"webSocket", "command":"DYNAMIK let s = $ShellyAuthDet; let n = $NeeoAuthDet; let req = {\"connection\":\"ws://$ShellyURI:$ShellyPort/rpc\", \"message\":{\"id\":2, \"src\":\"neeo\", \"method\":\"Switch.Set\",    \"params\":{\"id\":1, \"on\":false} }}; if ($Authenticated) {let auth = {\"realm\": s.realm, \"username\": n.username, \"nonce\": s.nonce, \"cnonce\": n.cnonce, \"response\": n.ha, \"algorithm\": \"SHA-256\"}; req.message.auth = auth}; req", "evalwrite":[{"variable":"SwitchActuated", "value": "1"}, {"variable":"PrepActionStatus", "value":"[\"turned off\", \"stays off\", \"Command failed\"]" }]},
+      "SWITCH 1 TOGGLE": {"type":"webSocket", "command":"DYNAMIK let s = $ShellyAuthDet; let n = $NeeoAuthDet; let req = {\"connection\":\"ws://$ShellyURI:$ShellyPort/rpc\", \"message\":{\"id\":2, \"src\":\"neeo\", \"method\":\"Switch.Toggle\", \"params\":{\"id\":1}               }}; if ($Authenticated) {let auth = {\"realm\": s.realm, \"username\": n.username, \"nonce\": s.nonce, \"cnonce\": n.cnonce, \"response\": n.ha, \"algorithm\": \"SHA-256\"}; req.message.auth = auth}; req", "evalwrite":[{"variable":"SwitchActuated", "value": "1"}, {"variable":"PrepActionStatus", "value":"[\"turned off\", \"turned on\", \"Command failed\"]" }]}
     }
   }
 }
