@@ -9,11 +9,11 @@ The drivers in this repository make use of the [Shelly Device Api for Gen2+](htt
 Further requirement: The IP addresses of your Shelly devices must be fixed!
 
 #### Authentication
-Shelly devices can be additionaly proteced by setting a password for each individual device. This password can be set (and/or removed) by accessing the following page using a web browser: `http://<shelly-ip>/#/settings/authentication`
+Shelly devices can be additionaly proteced by setting a password for each individual device. The authentication (password) can be set (and/or removed) for each individual Shelly device by accessing the following page using a web browser: `http://<shelly-ip>/#/settings/authentication`
 
-Authentication is NOT supported for now. This means that Shelly devices for which a password has been set for authentication are NOT compatible for the time being. This functionality may be added at a later stage.
+~~Authentication is NOT supported for now. This means that Shelly devices for which a password has been set for authentication are NOT compatible for the time being. This functionality may be added at a later stage.~~ **_Update:_ Authentication is now supported (25.03.2025)**.
 
-For Developers: Shelly devices of the first generation are using a very straight forward aproach to authenticate called "basic auth", where the username and password is encoded into the adressline of the http requests. From Gen2 upwards this was replaced by a ["digest authenticaton"](https://shelly-api-docs.shelly.cloud/gen2/General/Authentication) which is way more complicated to implement in the driver format of meta. This authentication method requires two http requests each to execute a command and computing authentication credentials in between.
+For Developers: Shelly devices of the first generation are using a very straight forward aproach to authenticate called "basic auth", where the username and password is encoded into the adressline of the http requests. From Gen2 upwards this was replaced by a ["digest authenticaton"](https://shelly-api-docs.shelly.cloud/gen2/General/Authentication) which is way more complicated to implement in the driver format of meta. With the http protocoll this authentication method requires two http requests each to execute a command and computing authentication credentials in between. Using the websocket protocoll will only requrire to compute the authentication credentials once for the time of the connection.
 
 So the decision was made to initially publish the driver without authentication.
 
@@ -30,11 +30,22 @@ So the decision was made to initially publish the driver without authentication.
 8. Open the NEEO App or the web-UI and go to: "Devices" > "Add a Device"
 9. Search for "shelly"
 10. Select the driver you are interested in.
-11. Click "next"
-12. When asked for the "<security code>", enter the IP adress of your Shelly Device (For example: "192.168.178.1") and click "verify". [Please Note: Port 80 is used by default. Add the port if different. For example: "192.168.178.1:81"] A communication and compatability check is performed in the background. If successful, your device will be added to the list of compatible devices displayed on the next page.
-13. Select the device you want to add to your NEEO and click "next".
+11. Click "NEXT"
+12. When asked for the `<security code>`, enter the IP adress of your Shelly Device (For example: `192.168.178.1`) and click "Verify". [Please Note: Port 80 is used by default. Add the port if different. For example: `192.168.178.1:81`] A communication and compatability check is performed in the background. If successful, your device will be added to the list of compatible devices displayed on the next page.
+13. Select the device you want to add to your NEEO and click "NEXT".
 14. Follow the remaining instructions in the app to install your device to your NEEO system.
- 
+
+#### Using Authentication
+The usage of the authentication feature is optionally. This feature may be used when additional safety is required. The password of the Shelly device must be entered during the step 12 of the above installation process.\
+Please use the following format, when asked for the `<security code>: password@192.168.178.1`
+
+##### Adding/ changing authentication at a later stage
+The authentication can be added to the shelly device (or changed) while the shelly device remains installed to your neeo system. For that first [set up the authentication in shelly device](#authentication). Then repeat the above installation process including the step 12 and enter the credentials as mentioned above. Clicking on "Verify" will store the new credentials. Then **do not** proceed with "NEXT", but use arrow in the top left corner to back out of the installation process.
+
+To deactivate the authentication first deactivate it in your shelly device. Then repeat the above installation process including the step 12 and enter just the ip adress. Clicking on "Verify" will store the removal of the password. Then **do not** proceed with "NEXT", but use arrow in the top left corner to back out of the installation process.
+
+To finish any changes in the credentials make sure to first shut down all related recipes and then restart meta.
+
 ### b) Manual Installation for advanced Users
 1. Download the respective driver file for your device (for example: "shelly-plus-2pm_switch.json") to the Subfolder "active" of your meta Installation.
 2. Restart meta
@@ -91,6 +102,9 @@ Known Issue/ limitation: Due to a known bug in the original firmware of the remo
 ##### Version 2
 - Rewritten from the ground up so that the websocket protocol is now used (in preparation to implement authentication).
 - Same features as in version 1.
+
+##### Version 2
+- added optional usage of authentication.
 
 ### In the Pipeline: Shelly Plus 2PM (Mode: Cover)
 The Shelly device ["Shelly Plus 2PM"](https://www.shelly.com/products/shelly-plus-2pm) contains two relays and is capable of power metering (PM) each channel. It can either be set to use both relays independently switch mode or it can be set to control covers/ blinds.\
