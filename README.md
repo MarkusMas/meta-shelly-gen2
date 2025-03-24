@@ -103,7 +103,7 @@ Known Issue/ limitation: Due to a known bug in the original firmware of the remo
 - Rewritten from the ground up so that the websocket protocol is now used (in preparation to implement authentication).
 - Same features as in version 1.
 
-##### Version 2
+##### Version 3
 - added optional usage of authentication.
 
 ### In the Pipeline: Shelly Plus 2PM (Mode: Cover)
