@@ -37,7 +37,7 @@ So the decision was made to initially publish the driver without authentication.
 
 #### Using Authentication
 The usage of the authentication feature is optionally. This feature may be used when additional safety is required. The password of the Shelly device must be entered during the step 12 of the above installation process.\
-Please use the following format, when asked for the `<security code>: password@192.168.178.1`
+Please use the following format, when asked for the `<security code>: password@ip-address`
 
 ##### Adding/ changing authentication at a later stage
 The authentication can be added to the shelly device (or changed) while the shelly device remains installed to your neeo system. For that first [set up the authentication in shelly device](#authentication). Then repeat the above installation process including the step 12 and enter the credentials as mentioned above. Clicking on "Verify" will store the new credentials. Then **do not** proceed with "NEXT", but use arrow in the top left corner to back out of the installation process.
