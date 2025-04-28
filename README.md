@@ -3,6 +3,8 @@ This repository contains a set of drivers to control Shelly devices of Gen2 upwa
 
 For Shelly devices of Gen1 please refer to the repository [meta-shelly-driver](https://github.com/vistalba/meta-shelly-driver) by @vistalba.
 
+Feel free to support me with some [coffee](https://www.paypal.me/MarkusMas721).
+
 ### Device Compatibility
 The drivers in this repository make use of the [Shelly Device Api for Gen2+](https://shelly-api-docs.shelly.cloud/gen2/) using the RPC protocol ~~via http protocoll~~  _update shelly plus 2pm v2:_ via a websocket connection. The compatibility of your Shelly devices is automatically checked during step 12 of the instructions below. All your compatible devices will be listed for installation.
 
@@ -120,6 +122,3 @@ This device is also capable of power metering (PM).
 
 ## Driver Walkthrough for interested Developers (Tutorial)
 If you are an interested developer or user you can have a look at the walkthrough of the driver "Shelly Plus 2PM (Mode: Switch)" in Version 1 i created. In this [tutorial](https://github.com/MarkusMas/meta-shelly-gen2/blob/main/tutorial/shelly-plus-2pm_switch_v1_tutorial.md) i am going through all the details of the driver.
-
-## ToDos
-- Add "digest authentication" so password protected Shellys can be used.
