@@ -1,5 +1,5 @@
 # meta-shelly-gen2
-This repository contains a set of drivers to control Shelly devices of Gen2 upwards using meta v2 and the original NEEO remote.
+This repository contains a set of drivers to control Shelly devices of Gen2 upwards using [meta v2](https://github.com/jac459/meta) and the original NEEO remote.
 
 For Shelly devices of Gen1 please refer to the repository [meta-shelly-driver](https://github.com/vistalba/meta-shelly-driver) by @vistalba.
 
